@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.zenn.yotsu.famipass"
+    namespace = "dev.zenn.yotsu.sibbphrase"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.zenn.yotsu.famipass"
+        applicationId = "dev.zenn.yotsu.sibbphrase"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

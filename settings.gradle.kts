@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Famipass"
+rootProject.name = "SibbPhrase"
 include(":app")

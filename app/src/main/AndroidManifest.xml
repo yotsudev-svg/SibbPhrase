@@ -6,7 +6,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
-        android:name=".FamiPassApplication"
+        android:name=".SibbPhraseApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,13 +14,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Famipass">
+        android:theme="@style/Theme.SibbPhrase">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Famipass"
+            android:theme="@style/Theme.SibbPhrase"
             android:windowSoftInputMode="adjustResize">
 
             <!-- 通常起動 -->
