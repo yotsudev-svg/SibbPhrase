@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.zenn.yotsu.sibbphrase.data.crypto.CryptoManager
 import dev.zenn.yotsu.sibbphrase.data.crypto.KeystoreManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,8 @@ data class EncryptUiState(
     val inputText:   String  = "",
     val outputText:  String  = "",
     val isLoading:   Boolean = false,
-    val errorMsg:    String? = null
+    val errorMsg:    String? = null,
+    val isCopied:    Boolean = false
 )
 
 @HiltViewModel
@@ -57,7 +59,15 @@ class EncryptViewModel @Inject constructor(
         }
     }
 
+    fun onCopied() {
+        _uiState.update { it.copy(isCopied = true) }
+        viewModelScope.launch {
+            delay(2000)
+            _uiState.update { it.copy(isCopied = false) }
+        }
+    }
+
     fun clearOutput() {
-        _uiState.update { it.copy(outputText = "", inputText = "") }
+        _uiState.update { it.copy(outputText = "", inputText = "", isCopied = false) }
     }
 }

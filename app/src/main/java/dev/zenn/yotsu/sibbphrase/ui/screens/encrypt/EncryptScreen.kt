@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,8 +22,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.zenn.yotsu.sibbphrase.R
 
 @Composable
 fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
@@ -39,6 +44,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
     val state by vm.uiState.collectAsState()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     // UI専用のローカルstate（ロジックには影響しない表示制御のみ）
@@ -50,6 +56,11 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
             .verticalScroll(scrollState)
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -74,14 +85,14 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "パスワードを暗号に変換する",
+                        text = stringResource(R.string.encrypt_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryColor
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "やり取りの途中で盗み見られても、合言葉がないと解読できない「安全な暗号」に変換します。",
+                        text = stringResource(R.string.encrypt_description),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 20.sp
@@ -96,7 +107,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "大切なパスワードを入力してください",
+                text = stringResource(R.string.encrypt_input_label),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -105,7 +116,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
             OutlinedTextField(
                 value = state.inputText,
                 onValueChange = vm::onInputChanged, // ロジックはファイルAのVMに完全準拠
-                placeholder = { Text("例: Pass1234 等の秘密情報", fontSize = 18.sp) },
+                placeholder = { Text(stringResource(R.string.encrypt_placeholder), fontSize = 18.sp) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 68.dp),
@@ -121,7 +132,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                         ) {
                             Icon(
                                 imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (showPassword) "パスワードを隠す" else "パスワードを表示"
+                                contentDescription = if (showPassword) stringResource(R.string.encrypt_visibility_hide) else stringResource(R.string.encrypt_visibility_show)
                             )
                         }
                         if (state.inputText.isNotEmpty()) {
@@ -131,7 +142,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = "文字をクリア"
+                                    contentDescription = stringResource(R.string.encrypt_clear_desc)
                                 )
                             }
                         }
@@ -154,7 +165,10 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
 
         // 変換実行ボタン（大きく押しやすいデザイン）
         Button(
-            onClick = vm::encrypt, // ロジックはファイルAのVMに完全準拠
+            onClick = {
+                focusManager.clearFocus()
+                vm.encrypt()
+            }, // ロジックはファイルAのVMに完全準拠
             enabled = !state.isLoading,
             modifier = Modifier
                 .fillMaxWidth()
@@ -176,7 +190,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "暗号化する（鍵をかける）",
+                    text = stringResource(R.string.encrypt_button),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -192,7 +206,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = "変換された暗号文（安全になった文字）：",
+                    text = stringResource(R.string.encrypt_result_label),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -218,59 +232,77 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                     )
                 }
 
-                // メイン送信ボタン：コピー＆共有（ロジックはファイルAのshareText/copyToClipboardを流用）
+                // メイン送信ボタン：コピー＆共有
+                val chooserTitle = stringResource(R.string.encrypt_share)
                 Button(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(state.outputText))
-                        shareText(context, state.outputText)
+                        shareText(context, state.outputText, chooserTitle)
+                        vm.onCopied()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = if (state.isCopied) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Send,
+                        imageVector = if (state.isCopied) Icons.Default.ContentCopy else Icons.Default.Send,
                         contentDescription = null,
                         modifier = Modifier.size(22.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "コピーして家族に送信する",
+                        text = if (state.isCopied) stringResource(R.string.encrypt_copied) else stringResource(R.string.encrypt_send_button),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                // サブアクション行：LINE / メール / コピー単体 / クリア
+                // サブアクション行：共有（他アプリ） / メール / コピー
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedButton(
-                        onClick = { shareText(context, state.outputText) },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("LINE", fontSize = 14.sp) }
+                        onClick = { shareText(context, state.outputText, chooserTitle) },
+                        modifier = Modifier.weight(1.1f)
+                    ) {
+                        Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(R.string.encrypt_share), fontSize = 12.sp, maxLines = 1)
+                    }
 
                     OutlinedButton(
-                        onClick = { shareText(context, state.outputText) },
+                        onClick = { shareText(context, state.outputText, chooserTitle) },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.Email, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("メール", fontSize = 14.sp)
+                        Text(stringResource(R.string.encrypt_email), fontSize = 12.sp, maxLines = 1)
                     }
 
                     OutlinedButton(
-                        onClick = { copyToClipboard(context, state.outputText) },
+                        onClick = {
+                            copyToClipboard(context, state.outputText)
+                            vm.onCopied()
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(
+                            imageVector = if (state.isCopied) Icons.Default.ContentCopy else Icons.Default.ContentCopy,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = if (state.isCopied) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("コピー", fontSize = 14.sp)
+                        Text(
+                            text = if (state.isCopied) stringResource(R.string.encrypt_copied) else stringResource(R.string.encrypt_copy),
+                            fontSize = 12.sp,
+                            maxLines = 1
+                        )
                     }
                 }
 
@@ -280,7 +312,7 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
                 ) {
                     Icon(Icons.Default.Clear, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("クリア", fontSize = 15.sp)
+                    Text(stringResource(R.string.encrypt_clear), fontSize = 15.sp)
                 }
             }
         }
@@ -293,10 +325,10 @@ private fun copyToClipboard(ctx: Context, text: String) {
     cm.setPrimaryClip(ClipData.newPlainText("SibbPhrase", text))
 }
 
-private fun shareText(ctx: Context, text: String) {
+private fun shareText(ctx: Context, text: String, title: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, text)
     }
-    ctx.startActivity(Intent.createChooser(intent, "送信先を選択"))
+    ctx.startActivity(Intent.createChooser(intent, title))
 }

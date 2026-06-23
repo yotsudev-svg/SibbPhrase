@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,8 +21,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import dev.zenn.yotsu.sibbphrase.R
@@ -36,6 +39,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
     val state by vm.uiState.collectAsState()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     // Green configuration theme（ファイルBのデザインを反映）
@@ -46,6 +50,11 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
             .verticalScroll(scrollState)
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -162,7 +171,10 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
 
         // 復元実行ボタン（大きく押しやすいデザイン）
         Button(
-            onClick = vm::decrypt, // ロジックはファイルAのVMに完全準拠
+            onClick = {
+                focusManager.clearFocus()
+                vm.decrypt()
+            }, // ロジックはファイルAのVMに完全準拠
             enabled = !state.isLoading,
             modifier = Modifier
                 .fillMaxWidth()

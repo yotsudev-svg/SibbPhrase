@@ -3,7 +3,7 @@
 
     <!-- DecryptScreen -->
     <string name="decrypt_title">送られてきた暗号を解読する</string>
-    <string name="decrypt_description">家族からLINE等で届いた暗号文（読めない文字列）を、ここに入力して元の言葉に復元します。</string>
+    <string name="decrypt_description">家族からメール等で届いた暗号文（読めない文字列）を、ここに入力して元の言葉に復元します。</string>
     <string name="decrypt_input_label">届いた暗号文を入力してください</string>
     <string name="decrypt_paste">貼り付け</string>
     <string name="decrypt_placeholder">ここに暗号化した文字を貼り付け...</string>
@@ -14,6 +14,23 @@
     <string name="decrypt_copy">コピーする</string>
     <string name="decrypt_copied">コピーしました ✓</string>
     <string name="decrypt_clear_now">今すぐ消去</string>
+
+    <!-- EncryptScreen -->
+    <string name="encrypt_title">パスワードを暗号に変換する</string>
+    <string name="encrypt_description">やり取りの途中で盗み見られても、合言葉がないと解読できない「安全な暗号」に変換します。</string>
+    <string name="encrypt_input_label">大切なパスワードを入力してください</string>
+    <string name="encrypt_placeholder">例: Pass1234 等の秘密情報</string>
+    <string name="encrypt_button">暗号化する（鍵をかける）</string>
+    <string name="encrypt_result_label">変換された暗号文（安全になった文字）：</string>
+    <string name="encrypt_send_button">コピーして家族に送信する</string>
+    <string name="encrypt_copied">コピーしました ✓</string>
+    <string name="encrypt_share">他アプリで送信</string>
+    <string name="encrypt_email">メール</string>
+    <string name="encrypt_copy">コピー</string>
+    <string name="encrypt_clear">クリア</string>
+    <string name="encrypt_visibility_show">パスワードを表示</string>
+    <string name="encrypt_visibility_hide">パスワードを隠す</string>
+    <string name="encrypt_clear_desc">文字をクリア</string>
 
     <!-- OnboardingScreen -->
     <string name="onboarding_skip">スキップ</string>
