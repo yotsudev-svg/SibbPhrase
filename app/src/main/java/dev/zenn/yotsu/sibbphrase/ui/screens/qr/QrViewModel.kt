@@ -111,6 +111,26 @@ class QrViewModel @Inject constructor(
         }
     }
 
+    /**
+     * カメラが使えない端末向けの手動入力フォールバック。
+     * QRペイロード形式（SIBBPHRASE::合言葉::有効期限）ではなく、
+     * 入力された合言葉をそのまま保存する。
+     */
+    fun applyManualPassphrase(passphrase: String) {
+        if (!_scanState.value.isScanning) return
+
+        if (passphrase.isBlank()) {
+            _scanState.update { it.copy(errorMsg = "合言葉を入力してください") }
+            return
+        }
+
+        _scanState.update { it.copy(isScanning = false) }
+        keystore.savePassphrase(passphrase)
+        _scanState.update {
+            it.copy(successMsg = "✅ 設定完了！家族と同じ合言葉が設定されました")
+        }
+    }
+
     fun resetScan() {
         _scanState.update { QrScanUiState() }
     }

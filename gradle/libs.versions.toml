@@ -21,6 +21,8 @@ mlkitBarcodeScanning = "17.3.0"
 zxing = "3.5.4"
 datastorePreferences = "1.2.1"
 ossLicensesPlugin = "0.12.0"
+biometric = "1.4.0-alpha07"
+biometricCompose = "1.4.0-alpha07"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +57,8 @@ google-mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-sc
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 google-oss-licenses = { group = "com.google.android.gms", name = "play-services-oss-licenses", version = "17.1.0" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+androidx-biometric-compose = { group = "androidx.biometric", name = "biometric-compose", version.ref = "biometricCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

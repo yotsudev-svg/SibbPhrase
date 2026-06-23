@@ -1,9 +1,14 @@
 package dev.zenn.yotsu.sibbphrase.ui.screens.qr
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
@@ -33,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -41,6 +47,16 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
+
+/** Composeのcontextからアクティビティを辿って取得するヘルパー */
+private fun Context.findActivity(): Activity? {
+    var ctx = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
+}
 
 @OptIn(ExperimentalGetImage::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +69,7 @@ fun QrScanScreen(
     val state          by vm.scanState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context        = LocalContext.current
+    val activity       = remember(context) { context.findActivity() }
 
     LaunchedEffect(state.successMsg) {
         if (state.successMsg != null) {
@@ -61,7 +78,7 @@ fun QrScanScreen(
         }
     }
 
-    // --- カメラハードウェア有無チェック（ファイルBのデザインに合わせて追加） ---
+    // --- カメラハードウェア有無チェック ---
     val hasCameraHardware = remember(context) {
         try {
             val manager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
@@ -72,14 +89,21 @@ fun QrScanScreen(
         }
     }
 
+    // --- カメラ権限管理（NavGraph側のWithCameraPermissionは廃止し、ここに一本化） ---
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         )
     }
+    // 修正: 「今後表示しない」判定のため、要求を一度でも行ったかを記録する
+    var permissionRequested by remember { mutableStateOf(false) }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { granted -> hasCameraPermission = granted }
+    ) { granted ->
+        hasCameraPermission = granted
+        permissionRequested = true
+    }
 
     LaunchedEffect(hasCameraHardware) {
         if (hasCameraHardware && !hasCameraPermission) {
@@ -87,11 +111,36 @@ fun QrScanScreen(
         }
     }
 
+    // 修正: 「今後表示しない」が選択された状態の判定。
+    // ・権限がまだ無い
+    // ・一度はリクエストを行った（permissionRequested）
+    // ・かつ shouldShowRequestPermissionRationale が false
+    //   （初回未リクエストの場合もfalseになるため、permissionRequestedと組み合わせて判定する）
+    val isPermanentlyDenied = !hasCameraPermission && permissionRequested && activity != null &&
+            !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+
     var manualKey by remember { mutableStateOf("") }
+
+    // --- カメラリソース（Provider/Executor）をComposable全体で保持し、離脱時に解放する ---
+    val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                if (cameraProviderFuture.isDone) {
+                    cameraProviderFuture.get().unbindAll()
+                }
+            } catch (e: Exception) {
+                // バインド前に離脱した場合などは無視
+            }
+            cameraExecutor.shutdown()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
-            // 成功表示（ロジックはファイルAのstate.successMsgのまま）
+            // 成功表示
             state.successMsg != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Card(
@@ -119,7 +168,7 @@ fun QrScanScreen(
                 }
             }
 
-            // カメラが使えない場合：手動入力フォールバック（ファイルBのデザインを反映）
+            // カメラが使えない場合：手動入力フォールバック
             !hasCameraHardware -> {
                 Column(
                     modifier = Modifier
@@ -175,7 +224,7 @@ fun QrScanScreen(
                             Button(
                                 onClick = {
                                     if (manualKey.trim().isNotEmpty()) {
-                                        vm.onQrScanned(manualKey.trim()) // ロジックはファイルAのVM処理を流用
+                                        vm.applyManualPassphrase(manualKey.trim())
                                     }
                                 },
                                 modifier = Modifier
@@ -195,7 +244,7 @@ fun QrScanScreen(
                 }
             }
 
-            // 権限が許可されていない場合（ファイルBのデザインを反映）
+            // 権限が許可されていない場合
             !hasCameraPermission -> {
                 Column(
                     modifier = Modifier
@@ -213,42 +262,64 @@ fun QrScanScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = "カメラの使用許可が必要です",
+                        text = if (isPermanentlyDenied) "カメラの許可がブロックされています" else "カメラの使用許可が必要です",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "家族のスマホ画面に表示されたQRコードを読み取るため、カメラへのアクセスを許可してください。",
+                        text = if (isPermanentlyDenied)
+                            "「今後表示しない」が選択されたため、アプリからは許可をリクエストできません。端末の設定画面からカメラ権限を有効にしてください。"
+                        else
+                            "家族のスマホ画面に表示されたQRコードを読み取るため、カメラへのアクセスを許可してください。",
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         lineHeight = 22.sp
                     )
                     Spacer(Modifier.height(20.dp))
-                    Button(
-                        onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text("カメラの許可を与える", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+                    if (isPermanentlyDenied) {
+                        // 修正: 「今後表示しない」状態では再リクエストしても無反応のため、
+                        // アプリ詳細設定画面を直接開く導線を用意する
+                        Button(
+                            onClick = {
+                                val intent = Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.fromParts("package", context.packageName, null)
+                                )
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text("設定画面を開く", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        }
+                    } else {
+                        Button(
+                            onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text("カメラの許可を与える", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
 
-            // 通常のスキャン画面（ロジックはファイルAのCameraX/ML Kit実装を維持、デザインのみ刷新）
+            // 通常のスキャン画面
             else -> {
                 AndroidView(
                     factory = { ctx ->
                         val previewView = PreviewView(ctx)
-                        val executor   = Executors.newSingleThreadExecutor()
-                        val cameraFuture = ProcessCameraProvider.getInstance(ctx)
 
-                        cameraFuture.addListener({
-                            val provider = cameraFuture.get()
+                        cameraProviderFuture.addListener({
+                            val provider = cameraProviderFuture.get()
 
                             val preview = Preview.Builder().build().also {
                                 it.setSurfaceProvider(previewView.surfaceProvider)
@@ -263,7 +334,7 @@ fun QrScanScreen(
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                                 .build()
                                 .also { ia ->
-                                    ia.setAnalyzer(executor) { imageProxy ->
+                                    ia.setAnalyzer(cameraExecutor) { imageProxy ->
                                         val mediaImage = imageProxy.image
                                         if (mediaImage != null) {
                                             val img = InputImage.fromMediaImage(
@@ -297,7 +368,7 @@ fun QrScanScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // スキャン枠ガイド（ファイルBのデザイン：太く大きい角丸枠＋強調キャプション）
+                // スキャン枠ガイド
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -333,7 +404,7 @@ fun QrScanScreen(
                     }
                 }
 
-                // エラーメッセージ（ロジックはファイルAのstate.errorMsgのまま）
+                // エラーメッセージ
                 state.errorMsg?.let { msg ->
                     Box(
                         modifier = Modifier

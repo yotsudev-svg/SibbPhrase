@@ -8,9 +8,11 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
+import dev.zenn.yotsu.sibbphrase.biometric.presentation.BiometricLockWrapper
 import dev.zenn.yotsu.sibbphrase.ui.MainViewModel
 import dev.zenn.yotsu.sibbphrase.ui.navigation.SibbPhraseApp
 import dev.zenn.yotsu.sibbphrase.ui.theme.SibbPhraseTheme
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,8 +26,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeMode by vm.themeMode.collectAsState()
+
             SibbPhraseTheme(appTheme = themeMode) {
-                SibbPhraseApp()
+                // ✅ ここで全体をラップするだけ！
+                // 認証が必要な場合は内部でロック画面が表示され、成功するとSibbPhraseAppが表示されます
+                BiometricLockWrapper {
+                    SibbPhraseApp()
+                }
             }
         }
     }
@@ -37,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
     private fun handleShareIntent(intent: Intent?) {
         if (intent?.action == Intent.ACTION_SEND &&
-            intent.type   == "text/plain"
+            intent.type == "text/plain"
         ) {
             val shared = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
             vm.onSharedText(shared)

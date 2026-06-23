@@ -20,7 +20,7 @@ import dev.zenn.yotsu.sibbphrase.ui.MainViewModel
 import dev.zenn.yotsu.sibbphrase.ui.SharedNavigationEvent
 import dev.zenn.yotsu.sibbphrase.ui.components.SibbPhraseTopBar
 import dev.zenn.yotsu.sibbphrase.ui.components.SibbPhraseTopBarPresets
-import dev.zenn.yotsu.sibbphrase.ui.components.WithCameraPermission
+// 修正: WithCameraPermissionは廃止（QrScanScreen側に権限管理を一本化したため import削除）
 import dev.zenn.yotsu.sibbphrase.ui.screens.decrypt.DecryptScreen
 import dev.zenn.yotsu.sibbphrase.ui.screens.decrypt.DecryptViewModel
 import dev.zenn.yotsu.sibbphrase.ui.screens.encrypt.EncryptScreen
@@ -71,12 +71,10 @@ fun SibbPhraseApp(
         }
     }
 
-    // ロジックは既存のshowBottomBarと同一条件（トップバーもこの3画面でのみ表示）
     val showBottomBar = currentRoute in listOf(
         Screen.Encrypt.route, Screen.Decrypt.route, Screen.Passphrase.route
     )
 
-    // 現在のルートに応じたトップバーの見た目（タイトル・背景色）を決定するだけの追加ロジック
     val topBarSpec = when (currentRoute) {
         Screen.Encrypt.route    -> SibbPhraseTopBarPresets.Encrypt
         Screen.Decrypt.route    -> SibbPhraseTopBarPresets.Decrypt
@@ -146,8 +144,7 @@ fun SibbPhraseApp(
             composable(Screen.Encrypt.route)  { EncryptScreen() }
             composable(Screen.Decrypt.route)  {
                 val decryptVm: DecryptViewModel = hiltViewModel()
-                
-                // 共有されたテキストがあればセットする
+
                 LaunchedEffect(Unit) {
                     mainVm.navigationEvent.collect { event ->
                         if (event is SharedNavigationEvent.GoToDecrypt) {
@@ -155,15 +152,15 @@ fun SibbPhraseApp(
                         }
                     }
                 }
-                
+
                 DecryptScreen(vm = decryptVm)
             }
             composable(Screen.Passphrase.route) { PassphraseScreen(nav = nav) }
             composable(Screen.QrShow.route)   { QrShowScreen(navController = nav) }
+            // 修正: WithCameraPermissionラッパーを除去。
+            // 権限・ハードウェアチェックはQrScanScreen内に一本化。
             composable(Screen.QrScan.route)   {
-                WithCameraPermission {
-                    QrScanScreen(navController = nav, onSuccess = { nav.popBackStack() })
-                }
+                QrScanScreen(navController = nav, onSuccess = { nav.popBackStack() })
             }
             composable(Screen.Settings.route) { SettingsScreen() }
         }

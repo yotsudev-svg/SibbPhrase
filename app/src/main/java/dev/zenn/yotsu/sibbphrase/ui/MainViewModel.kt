@@ -18,7 +18,7 @@ sealed class SharedNavigationEvent {
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val keystore: KeystoreManager,
-    dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     private val _navigationEvent = MutableSharedFlow<SharedNavigationEvent>(extraBufferCapacity = 1)
@@ -26,6 +26,7 @@ class MainViewModel @Inject constructor(
 
     val themeMode: StateFlow<AppTheme> = dataStoreManager.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppTheme.SYSTEM)
+
 
     fun onSharedText(text: String) {
         viewModelScope.launch {

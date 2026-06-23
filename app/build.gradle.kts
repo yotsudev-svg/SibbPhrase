@@ -8,12 +8,13 @@ plugins {
 
 android {
     namespace = "dev.zenn.yotsu.sibbphrase"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "dev.zenn.yotsu.sibbphrase"
         minSdk = 26
-        targetSdk = 36
+        //noinspection OldTargetApi
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -39,6 +40,8 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.biometric.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
