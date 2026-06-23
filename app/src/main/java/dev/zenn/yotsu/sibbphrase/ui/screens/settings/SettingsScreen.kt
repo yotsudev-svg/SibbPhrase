@@ -25,12 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.biometric.presentation.BiometricLockViewModel
 import dev.zenn.yotsu.sibbphrase.model.AppTheme
 
@@ -64,7 +66,7 @@ fun SettingsScreen(
                 modifier = Modifier.size(22.dp)
             )
             Text(
-                text = "全般設定",
+                text = stringResource(R.string.settings_general_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -84,13 +86,13 @@ fun SettingsScreen(
                 // --- テーマ選択 ---
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "アプリのテーマ設定",
+                        text = stringResource(R.string.settings_theme_label),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "各画面の機能色を生かすライトテーマと、目に優しいコントラストのダークテーマを選べます。",
+                        text = stringResource(R.string.settings_theme_desc),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
@@ -102,9 +104,9 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         listOf(
-                            Triple(AppTheme.SYSTEM, "システム", Icons.Default.Android),
-                            Triple(AppTheme.LIGHT, "ライト", Icons.Default.WbSunny),
-                            Triple(AppTheme.DARK, "ダーク", Icons.Default.DarkMode)
+                            Triple(AppTheme.SYSTEM, stringResource(R.string.settings_theme_system), Icons.Default.Android),
+                            Triple(AppTheme.LIGHT, stringResource(R.string.settings_theme_light), Icons.Default.WbSunny),
+                            Triple(AppTheme.DARK, stringResource(R.string.settings_theme_dark), Icons.Default.DarkMode)
                         ).forEach { (theme, label, icon) ->
                             val isSelected = themeMode == theme
                             Button(
@@ -156,14 +158,14 @@ fun SettingsScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = "クリップボード自動削除時間",
+                            text = stringResource(R.string.settings_clipboard_label),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Text(
-                        text = "安全のため、復元したパスワードをコピーしてからスマホのクリップボード内に残しておく時間です。",
+                        text = stringResource(R.string.settings_clipboard_desc),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
@@ -203,7 +205,7 @@ fun SettingsScreen(
                 modifier = Modifier.size(22.dp)
             )
             Text(
-                text = "セキュリティ設定",
+                text = stringResource(R.string.settings_security_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -242,20 +244,20 @@ fun SettingsScreen(
                     )
                     Column {
                         Text(
-                            text = "アプリ起動時にロックを要求",
+                            text = stringResource(R.string.settings_biometric_label),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "アプリを開く際に、生体認証（指紋・顔）または端末の暗証番号でのロック解除を強制します。",
+                            text = stringResource(R.string.settings_biometric_desc),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 16.sp
                         )
                         if (!biometricState.isHardwareAvailable) {
                             Text(
-                                text = "端末に指紋・顔認証、または画面ロック（PIN等）が設定されていないため利用できません",
+                                text = stringResource(R.string.settings_biometric_unavailable),
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.error,
                                 lineHeight = 14.sp,
@@ -288,7 +290,7 @@ fun SettingsScreen(
                 modifier = Modifier.size(22.dp)
             )
             Text(
-                text = "アプリ情報",
+                text = stringResource(R.string.settings_info_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -328,13 +330,13 @@ fun SettingsScreen(
                         )
                         Column {
                             Text(
-                                text = "オープンソースライセンス",
+                                text = stringResource(R.string.settings_oss_label),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "本アプリで使用されている外部ライブラリなどの情報です。",
+                                text = stringResource(R.string.settings_oss_desc),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -342,7 +344,7 @@ fun SettingsScreen(
                     }
                     Icon(
                         imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "表示",
+                        contentDescription = stringResource(R.string.settings_oss_view),
                         tint = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.size(20.dp)
                     )
@@ -351,7 +353,7 @@ fun SettingsScreen(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 Text(
-                    text = "Version 1.0.0",
+                    text = stringResource(R.string.settings_version),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp)

@@ -18,33 +18,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import dev.zenn.yotsu.sibbphrase.R
 
 private data class OnboardingPage(
     val icon:        ImageVector,
-    val title:       String,
-    val description: String
+    val titleRes:    Int,
+    val descriptionRes: Int
 )
 
 private val pages = listOf(
     OnboardingPage(
         icon        = Icons.Outlined.Lock,
-        title       = "SibbPhraseへようこそ",
-        description = "パスワードや電話番号など\n大切な情報を安全に家族と\n共有するためのアプリです"
+        titleRes    = R.string.onboarding_p1_title,
+        descriptionRes = R.string.onboarding_p1_desc
     ),
     OnboardingPage(
         icon        = Icons.Outlined.Shield,
-        title       = "暗号化で守る",
-        description = "送信前に情報を暗号化するので\nメールやLINEに残っても\n他人には読めません"
+        titleRes    = R.string.onboarding_p2_title,
+        descriptionRes = R.string.onboarding_p2_desc
     ),
     OnboardingPage(
         icon        = Icons.Outlined.FamilyRestroom,
-        title       = "家族だけが復元できる",
-        description = "家族共通の「合言葉」を\nQRコードで共有するだけで\n同じアプリで元に戻せます"
+        titleRes    = R.string.onboarding_p3_title,
+        descriptionRes = R.string.onboarding_p3_desc
     ),
     OnboardingPage(
         icon        = Icons.Outlined.Key,
-        title       = "まず合言葉を設定しよう",
-        description = "最初に家族共通の合言葉を\n決めてください\n設定画面からいつでも変更できます"
+        titleRes    = R.string.onboarding_p4_title,
+        descriptionRes = R.string.onboarding_p4_desc
     )
 )
 
@@ -66,7 +68,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     onClick  = onFinish,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    Text("スキップ", fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                    text = stringResource(R.string.onboarding_skip),
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 }
             }
         }
@@ -119,7 +125,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     onClick  = { currentPage-- },
                     modifier = Modifier.weight(1f).height(56.dp)
                 ) {
-                    Text("戻る", fontSize = 17.sp)
+                    Text(stringResource(R.string.onboarding_back), fontSize = 17.sp)
                 }
             }
 
@@ -131,7 +137,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 modifier = Modifier.weight(2f).height(56.dp)
             ) {
                 Text(
-                    if (isLastPage) "合言葉を設定する 🔑" else "次へ",
+                    if (isLastPage) stringResource(R.string.onboarding_finish) else stringResource(R.string.onboarding_next),
                     fontSize = 17.sp
                 )
             }
@@ -164,14 +170,14 @@ private fun PageContent(page: OnboardingPage) {
         }
 
         Text(
-            text       = page.title,
+            text       = stringResource(page.titleRes),
             fontSize   = 26.sp,
             fontWeight = FontWeight.Bold,
             textAlign  = TextAlign.Center
         )
 
         Text(
-            text      = page.description,
+            text      = stringResource(page.descriptionRes),
             fontSize  = 17.sp,
             textAlign = TextAlign.Center,
             color     = MaterialTheme.colorScheme.onSurfaceVariant,

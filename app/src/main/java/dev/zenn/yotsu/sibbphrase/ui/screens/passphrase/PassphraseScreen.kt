@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.ui.navigation.Screen
 
 @Composable
@@ -47,17 +49,17 @@ fun PassphraseScreen(
     if (showChangeDialog) {
         AlertDialog(
             onDismissRequest = { showChangeDialog = false },
-            title   = { Text("合言葉を変更しますか？") },
-            text    = { Text("現在の合言葉は上書きされます。") },
+            title   = { Text(stringResource(R.string.passphrase_dialog_change_title)) },
+            text    = { Text(stringResource(R.string.passphrase_dialog_change_text)) },
             confirmButton = {
                 TextButton(onClick = {
                     showChangeDialog = false
                     newPass = ""
                     vm.enterEditMode()
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.passphrase_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showChangeDialog = false }) { Text("キャンセル") }
+                TextButton(onClick = { showChangeDialog = false }) { Text(stringResource(R.string.passphrase_cancel)) }
             }
         )
     }
@@ -66,20 +68,22 @@ fun PassphraseScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title   = { Text("合言葉をリセットしますか？") },
-            text    = { Text("設定した合言葉が削除され、初期状態に戻ります。") },
+            title   = { Text(stringResource(R.string.passphrase_dialog_reset_title)) },
+            text    = { Text(stringResource(R.string.passphrase_dialog_reset_text)) },
             confirmButton = {
                 TextButton(onClick = {
                     showResetDialog = false
                     newPass = ""
                     vm.resetPassphrase()
-                }) { Text("OK", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.passphrase_ok), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text("キャンセル") }
+                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.passphrase_cancel)) }
             }
         )
     }
+
+    val errorShortMsg = stringResource(R.string.passphrase_error_too_short)
 
     Column(
         modifier = Modifier
@@ -108,14 +112,14 @@ fun PassphraseScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "家族の秘密の合言葉を登録",
+                        text = stringResource(R.string.passphrase_banner_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "暗号を変換・復元するために使う家族だけの「秘密の合言葉」です。同じ合言葉を設定した家族間でのみパスワードを復元できます。",
+                        text = stringResource(R.string.passphrase_banner_desc),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 20.sp
@@ -132,7 +136,7 @@ fun PassphraseScreen(
             val isEnabled = !state.hasPassphrase || state.isEditing
 
             Text(
-                text = if (isEnabled) "合言葉を設定する" else "設定済みの合言葉",
+                text = if (isEnabled) stringResource(R.string.passphrase_input_label_new) else stringResource(R.string.passphrase_input_label_saved),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -140,7 +144,7 @@ fun PassphraseScreen(
             
             if (state.hasPassphrase && !state.isEditing) {
                 Text(
-                    text = "✅ 合言葉が設定済みです",
+                    text = stringResource(R.string.passphrase_status_set),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
@@ -151,7 +155,7 @@ fun PassphraseScreen(
                 value = if (isEnabled) newPass else "••••••••",
                 onValueChange = { newPass = it; errorMsg = null },
                 enabled = isEnabled,
-                placeholder = { Text("例: yamadake2026 などの文字", fontSize = 18.sp) },
+                placeholder = { Text(stringResource(R.string.passphrase_placeholder), fontSize = 18.sp) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 68.dp),
@@ -167,7 +171,7 @@ fun PassphraseScreen(
                         ) {
                             Icon(
                                 imageVector = if (showPass) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                                contentDescription = if (showPass) "合言葉を隠す" else "合言葉を表示"
+                                contentDescription = if (showPass) stringResource(R.string.passphrase_visibility_hide) else stringResource(R.string.passphrase_visibility_show)
                             )
                         }
                     }
@@ -175,17 +179,17 @@ fun PassphraseScreen(
             )
 
             errorMsg?.let {
-                Text(it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(errorShortMsg, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             if (savedMsg) {
-                Text("✅ 保存しました", color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.passphrase_save_success), color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
 
             if (isEnabled) {
                 Button(
                     onClick = {
                         when {
-                            newPass.length < 4     -> errorMsg = "合言葉は4文字以上にしてください"
+                            newPass.length < 4     -> errorMsg = errorShortMsg
                             else -> {
                                 vm.savePassphrase(newPass)
                                 newPass     = ""
@@ -199,7 +203,7 @@ fun PassphraseScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = passphraseColor)
                 ) {
-                    Text("保存する", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.passphrase_save_button), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Row(
@@ -214,7 +218,7 @@ fun PassphraseScreen(
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = passphraseColor)
                     ) {
-                        Text("変更する", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.passphrase_change_button), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                     
                     OutlinedButton(
@@ -226,7 +230,7 @@ fun PassphraseScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
                     ) {
-                        Text("リセット", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.passphrase_reset_button), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -235,7 +239,9 @@ fun PassphraseScreen(
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         // QR連携セクション（ロジックはファイルAのnav.navigateを維持）
-        Column(
+        val errorShortMsg = stringResource(R.string.passphrase_error_too_short)
+
+    Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -254,7 +260,7 @@ fun PassphraseScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "QRコードで共有する（親機）",
+                    text = stringResource(R.string.passphrase_qr_share),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -274,7 +280,7 @@ fun PassphraseScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "家族のQRコードを読み取る（子機）",
+                    text = stringResource(R.string.passphrase_qr_scan),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )

@@ -22,7 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import dev.zenn.yotsu.sibbphrase.R
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,14 +70,14 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "送られてきた暗号を解読する",
+                        text = stringResource(R.string.decrypt_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = successTextColor
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "家族からLINE等で届いた暗号文（読めない文字列）を、ここに入力して元の言葉に復元します。",
+                        text = stringResource(R.string.decrypt_description),
                         fontSize = 14.sp,
                         color = successTextColor,
                         lineHeight = 20.sp
@@ -95,7 +97,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "届いた暗号文を入力してください",
+                    text = stringResource(R.string.decrypt_input_label),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -117,14 +119,14 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("貼り付け", fontSize = 14.sp)
+                    Text(stringResource(R.string.decrypt_paste), fontSize = 14.sp)
                 }
             }
 
             OutlinedTextField(
                 value = state.inputText,
                 onValueChange = vm::onInputChanged, // ロジックはファイルAのVMに完全準拠
-                placeholder = { Text("ここに暗号化した文字を貼り付け...", fontSize = 18.sp) },
+                placeholder = { Text(stringResource(R.string.decrypt_placeholder), fontSize = 18.sp) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 100.dp),
@@ -138,7 +140,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "クリア"
+                                contentDescription = stringResource(R.string.decrypt_clear)
                             )
                         }
                     }
@@ -182,7 +184,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "復元する（鍵を開ける）",
+                    text = stringResource(R.string.decrypt_button),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -202,7 +204,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "🔑 復元された元のパスワード：",
+                    text = stringResource(R.string.decrypt_result_label),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -254,7 +256,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "高い安全性のために ${sec} 秒後に消去します",
+                                        text = stringResource(R.string.decrypt_timer_msg, sec),
                                         color = MaterialTheme.colorScheme.error,
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold
@@ -289,7 +291,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = if (state.isCopied) "コピーしました ✓" else "コピーする",
+                                    text = if (state.isCopied) stringResource(R.string.decrypt_copied) else stringResource(R.string.decrypt_copy),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -307,7 +309,7 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.error)
                             ) {
-                                Text("今すぐ消去", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.decrypt_clear_now), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }

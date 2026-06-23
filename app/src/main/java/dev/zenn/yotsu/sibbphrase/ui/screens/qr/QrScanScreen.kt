@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import dev.zenn.yotsu.sibbphrase.R
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 
@@ -155,7 +157,7 @@ fun QrScanScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text("✅", fontSize = 56.sp)
+                            Text(stringResource(R.string.qr_scan_success_icon), fontSize = 56.sp)
                             Text(
                                 state.successMsg!!,
                                 fontSize = 18.sp,
@@ -186,14 +188,14 @@ fun QrScanScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = "カメラが利用できません",
+                        text = stringResource(R.string.qr_scan_camera_unavailable),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "この端末ではカメラが見つかりませんでした。代わりに、家族から伝えられた合言葉を下の欄に直接入力してください。",
+                        text = stringResource(R.string.qr_scan_camera_unavailable_desc),
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -216,7 +218,7 @@ fun QrScanScreen(
                             OutlinedTextField(
                                 value = manualKey,
                                 onValueChange = { manualKey = it },
-                                placeholder = { Text("合言葉を入力してください...", fontSize = 16.sp) },
+                                placeholder = { Text(stringResource(R.string.qr_scan_manual_placeholder), fontSize = 16.sp) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 16.sp)
@@ -232,7 +234,7 @@ fun QrScanScreen(
                                     .height(52.dp),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Text("適用して登録する", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.qr_scan_manual_submit), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -262,7 +264,7 @@ fun QrScanScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = if (isPermanentlyDenied) "カメラの許可がブロックされています" else "カメラの使用許可が必要です",
+                        text = if (isPermanentlyDenied) stringResource(R.string.qr_scan_permission_denied) else stringResource(R.string.qr_scan_permission_required),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -270,9 +272,9 @@ fun QrScanScreen(
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = if (isPermanentlyDenied)
-                            "「今後表示しない」が選択されたため、アプリからは許可をリクエストできません。端末の設定画面からカメラ権限を有効にしてください。"
+                            stringResource(R.string.qr_scan_permission_denied_desc)
                         else
-                            "家族のスマホ画面に表示されたQRコードを読み取るため、カメラへのアクセスを許可してください。",
+                            stringResource(R.string.qr_scan_permission_required_desc),
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -296,7 +298,7 @@ fun QrScanScreen(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text("設定画面を開く", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.qr_scan_open_settings), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     } else {
                         Button(
@@ -306,7 +308,7 @@ fun QrScanScreen(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text("カメラの許可を与える", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.qr_scan_grant_permission), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -393,7 +395,7 @@ fun QrScanScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "枠の中にQRコードを入れてください",
+                                text = stringResource(R.string.qr_scan_guide),
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,

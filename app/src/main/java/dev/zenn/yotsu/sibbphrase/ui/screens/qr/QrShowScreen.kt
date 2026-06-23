@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.data.qr.QrManager
 
 @Composable
@@ -41,7 +43,7 @@ fun QrShowScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("QRコードで共有", fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.qr_show_title), fontSize = 18.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "戻る")
@@ -77,14 +79,14 @@ fun QrShowScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "QRコードで共有",
+                        text = stringResource(R.string.qr_show_banner_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "家族のスマホでこのQRコードをスキャンしてもらってください。",
+                        text = stringResource(R.string.qr_show_banner_desc),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 20.sp
@@ -128,7 +130,7 @@ fun QrShowScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            "QRコードの有効期限が切れました",
+                            stringResource(R.string.qr_show_expired_title),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onErrorContainer,
@@ -143,7 +145,7 @@ fun QrShowScreen(
                         ) {
                             Icon(Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(22.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("もう一度表示する", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.qr_show_regenerate), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -174,7 +176,7 @@ fun QrShowScreen(
                         ) {
                             Image(
                                 bitmap = state.qrBitmap!!.asImageBitmap(),
-                                contentDescription = "QRコード",
+                                contentDescription = stringResource(R.string.qr_show_desc),
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -197,7 +199,7 @@ fun QrShowScreen(
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                "有効期限：あと ${state.remainingSeconds} 秒",
+                                stringResource(R.string.qr_show_expiry_msg, state.remainingSeconds),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (progress > 0.3f) MaterialTheme.colorScheme.onSurfaceVariant
@@ -208,7 +210,7 @@ fun QrShowScreen(
                 }
 
                 Text(
-                    "対面でスキャンしてください\nスクリーンショットは送らないでください",
+                    stringResource(R.string.qr_show_warning),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

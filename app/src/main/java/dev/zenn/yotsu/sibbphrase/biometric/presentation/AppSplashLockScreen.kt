@@ -17,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.zenn.yotsu.sibbphrase.R
 
 @Composable
 fun AppSplashLockScreen(
@@ -47,7 +49,7 @@ fun AppSplashLockScreen(
             Icon(
                 imageVector = Icons.Default.Lock,
                 // ✅ contentDescription を日本語に統一（TalkBack 対応）
-                contentDescription = "アプリはロックされています",
+                contentDescription = stringResource(R.string.lock_screen_content_desc),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(72.dp)
             )
@@ -55,7 +57,7 @@ fun AppSplashLockScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "アプリは保護されています",
+                text = stringResource(R.string.lock_screen_protected),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -64,7 +66,7 @@ fun AppSplashLockScreen(
 
             if (uiState.attemptCount > 0 && !uiState.isLockout) {
                 Text(
-                    text = "認証失敗: ${uiState.attemptCount}回",
+                    text = stringResource(R.string.lock_screen_fail_count, uiState.attemptCount),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.error
                 )
@@ -90,7 +92,7 @@ fun AppSplashLockScreen(
                 // ロックアウト中：PIN でのロック解除を案内
                 uiState.isLockout -> {
                     Text(
-                        text = "スマートフォンのPINコードやパターン入力で画面ロックを一度解除すると、生体認証が再試行可能になります。",
+                        text = stringResource(R.string.lock_screen_lockout_guide),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         textAlign = TextAlign.Center,
@@ -103,7 +105,7 @@ fun AppSplashLockScreen(
                 //    API 29 以下はセキュリティ設定画面へフォールバック
                 uiState.isEnrollmentRequired -> {
                     Text(
-                        text = "端末に生体情報が登録されていません。設定から登録してください。",
+                        text = stringResource(R.string.lock_screen_enroll_required),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
@@ -130,7 +132,7 @@ fun AppSplashLockScreen(
                             context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
                         }
                     }) {
-                        Text("生体情報を登録する")
+                        Text(stringResource(R.string.lock_screen_enroll_button))
                     }
                 }
 
@@ -146,7 +148,7 @@ fun AppSplashLockScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        Text(text = "再試行する")
+                        Text(text = stringResource(R.string.lock_screen_retry))
                     }
                 }
             }

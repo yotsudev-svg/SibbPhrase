@@ -1,3 +1,106 @@
 <resources>
     <string name="app_name">SibbPhrase</string>
+
+    <!-- DecryptScreen -->
+    <string name="decrypt_title">送られてきた暗号を解読する</string>
+    <string name="decrypt_description">家族からLINE等で届いた暗号文（読めない文字列）を、ここに入力して元の言葉に復元します。</string>
+    <string name="decrypt_input_label">届いた暗号文を入力してください</string>
+    <string name="decrypt_paste">貼り付け</string>
+    <string name="decrypt_placeholder">ここに暗号化した文字を貼り付け...</string>
+    <string name="decrypt_clear">クリア</string>
+    <string name="decrypt_button">復元する（鍵を開ける）</string>
+    <string name="decrypt_result_label">🔑 復元された元のパスワード：</string>
+    <string name="decrypt_timer_msg">高い安全性のために %1$d 秒後に消去します</string>
+    <string name="decrypt_copy">コピーする</string>
+    <string name="decrypt_copied">コピーしました ✓</string>
+    <string name="decrypt_clear_now">今すぐ消去</string>
+
+    <!-- OnboardingScreen -->
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_back">戻る</string>
+    <string name="onboarding_next">次へ</string>
+    <string name="onboarding_finish">合言葉を設定する 🔑</string>
+    <string name="onboarding_p1_title">SibbPhraseへようこそ</string>
+    <string name="onboarding_p1_desc">パスワードや電話番号など\n大切な情報を安全に家族と\n共有するためのアプリです</string>
+    <string name="onboarding_p2_title">暗号化で守る</string>
+    <string name="onboarding_p2_desc">送信前に情報を暗号化するので\nメールやLINEに残っても\n他人には読めません</string>
+    <string name="onboarding_p3_title">家族だけが復元できる</string>
+    <string name="onboarding_p3_desc">家族共通の「合言葉」を\nQRコードで共有するだけで\n同じアプリで元に戻せます</string>
+    <string name="onboarding_p4_title">まず合言葉を設定しよう</string>
+    <string name="onboarding_p4_desc">最初に家族共通の合言葉を\n決めてください\n設定画面からいつでも変更できます</string>
+
+    <!-- PassphraseScreen -->
+    <string name="passphrase_dialog_change_title">合言葉を変更しますか？</string>
+    <string name="passphrase_dialog_change_text">現在の合言葉は上書きされます。</string>
+    <string name="passphrase_dialog_reset_title">合言葉をリセットしますか？</string>
+    <string name="passphrase_dialog_reset_text">設定した合言葉が削除され、初期状態に戻ります。</string>
+    <string name="passphrase_ok">OK</string>
+    <string name="passphrase_cancel">キャンセル</string>
+    <string name="passphrase_banner_title">家族の秘密の合言葉を登録</string>
+    <string name="passphrase_banner_desc">暗号を変換・復元するために使う家族だけの「秘密の合言葉」です。同じ合言葉を設定した家族間でのみパスワードを復元できます。</string>
+    <string name="passphrase_input_label_new">合言葉を設定する</string>
+    <string name="passphrase_input_label_saved">設定済みの合言葉</string>
+    <string name="passphrase_status_set">✅ 合言葉が設定済みです</string>
+    <string name="passphrase_placeholder">例: yamadake2026 などの文字</string>
+    <string name="passphrase_visibility_hide">合言葉を隠す</string>
+    <string name="passphrase_visibility_show">合言葉を表示</string>
+    <string name="passphrase_error_too_short">合言葉は4文字以上にしてください</string>
+    <string name="passphrase_save_success">✅ 保存しました</string>
+    <string name="passphrase_save_button">保存する</string>
+    <string name="passphrase_change_button">変更する</string>
+    <string name="passphrase_reset_button">リセット</string>
+    <string name="passphrase_qr_share">QRコードで共有する（親機）</string>
+    <string name="passphrase_qr_scan">家族のQRコードを読み取る（子機）</string>
+
+    <!-- QrScanScreen -->
+    <string name="qr_scan_success_icon">✅</string>
+    <string name="qr_scan_camera_unavailable">カメラが利用できません</string>
+    <string name="qr_scan_camera_unavailable_desc">この端末ではカメラが見つかりませんでした。代わりに、家族から伝えられた合言葉を下の欄に直接入力してください。</string>
+    <string name="qr_scan_manual_placeholder">合言葉を入力してください...</string>
+    <string name="qr_scan_manual_submit">適用して登録する</string>
+    <string name="qr_scan_permission_denied">カメラの許可がブロックされています</string>
+    <string name="qr_scan_permission_required">カメラの使用許可が必要です</string>
+    <string name="qr_scan_permission_denied_desc">「今後表示しない」が選択されたため、アプリからは許可をリクエストできません。端末の設定画面からカメラ権限を有効にしてください。</string>
+    <string name="qr_scan_permission_required_desc">家族のスマホ画面に表示されたQRコードを読み取るため、カメラへのアクセスを許可してください。</string>
+    <string name="qr_scan_open_settings">設定画面を開く</string>
+    <string name="qr_scan_grant_permission">カメラの許可を与える</string>
+    <string name="qr_scan_guide">枠の中にQRコードを入れてください</string>
+
+    <!-- QrShowScreen -->
+    <string name="qr_show_title">QRコードで共有</string>
+    <string name="qr_show_banner_title">QRコードで共有</string>
+    <string name="qr_show_banner_desc">家族のスマホでこのQRコードをスキャンしてもらってください。</string>
+    <string name="qr_show_expired_title">QRコードの有効期限が切れました</string>
+    <string name="qr_show_regenerate">もう一度表示する</string>
+    <string name="qr_show_desc">QRコード</string>
+    <string name="qr_show_expiry_msg">有効期限：あと %1$d 秒</string>
+    <string name="qr_show_warning">対面でスキャンしてください\nスクリーンショットは送らないでください</string>
+
+    <!-- SettingsScreen -->
+    <string name="settings_general_title">全般設定</string>
+    <string name="settings_theme_label">アプリのテーマ設定</string>
+    <string name="settings_theme_desc">各画面の機能色を生かすライトテーマと、目に優しいコントラストのダークテーマを選べます。</string>
+    <string name="settings_theme_system">システム</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_dark">ダーク</string>
+    <string name="settings_clipboard_label">クリップボード自動削除時間</string>
+    <string name="settings_clipboard_desc">安全のため、復元したパスワードをコピーしてからスマホのクリップボード内に残しておく時間です。</string>
+    <string name="settings_security_title">セキュリティ設定</string>
+    <string name="settings_biometric_label">アプリ起動時にロックを要求</string>
+    <string name="settings_biometric_desc">アプリを開く際に、生体認証（指紋・顔）または端末の暗証番号でのロック解除を強制します。</string>
+    <string name="settings_biometric_unavailable">端末に指紋・顔認証、または画面ロック（PIN等）が設定されていないため利用できません</string>
+    <string name="settings_info_title">アプリ情報</string>
+    <string name="settings_oss_label">オープンソースライセンス</string>
+    <string name="settings_oss_desc">本アプリで使用されている外部ライブラリなどの情報です。</string>
+    <string name="settings_oss_view">表示</string>
+    <string name="settings_version">Version 1.0.0</string>
+
+    <!-- AppSplashLockScreen -->
+    <string name="lock_screen_content_desc">アプリはロックされています</string>
+    <string name="lock_screen_protected">アプリは保護されています</string>
+    <string name="lock_screen_fail_count">認証失敗: %1$d回</string>
+    <string name="lock_screen_lockout_guide">スマートフォンのPINコードやパターン入力で画面ロックを一度解除すると、生体認証が再試行可能になります。</string>
+    <string name="lock_screen_enroll_required">端末に生体情報が登録されていません。設定から登録してください。</string>
+    <string name="lock_screen_enroll_button">生体情報を登録する</string>
+    <string name="lock_screen_retry">再試行する</string>
 </resources>
