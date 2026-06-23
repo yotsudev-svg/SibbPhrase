@@ -1,11 +1,23 @@
 package dev.zenn.yotsu.sibbphrase.ui.screens.settings
 
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,12 +40,10 @@ fun SettingsScreen(
     vm: SettingsViewModel = hiltViewModel(),
     biometricLockViewModel: BiometricLockViewModel = hiltViewModel()
 ) {
-    val autoDeleteSec by vm.autoDeleteSec.collectAsState()
-    val themeMode by vm.themeMode.collectAsState() // ViewModelから現在のテーマを取得
+    val autoDeleteSec  by vm.autoDeleteSec.collectAsState()
+    val themeMode      by vm.themeMode.collectAsState()
     val biometricState by biometricLockViewModel.uiState.collectAsStateWithLifecycle()
-
-    val containerBg = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
-    val context = LocalContext.current
+    val context        = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -42,161 +52,311 @@ fun SettingsScreen(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Text(
-            text = "全般設定",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        // ✅ 追加：テーマ設定カード
-        Card(
-            colors = CardDefaults.cardColors(containerColor = containerBg),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+        // ─── 全般設定セクション ────────────────────────────────
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("アプリのテーマ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // AppThemeの列挙型（SYSTEM, LIGHT, DARK）に合わせて選択肢をループ生成
-                AppTheme.entries.forEach { theme ->
-                    val label = when (theme) {
-                        AppTheme.SYSTEM -> "システムの設定に従う"
-                        AppTheme.LIGHT -> "ライトテーマ"
-                        AppTheme.DARK -> "ダークテーマ"
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { vm.setThemeMode(theme) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (themeMode == theme),
-                            onClick = { vm.setThemeMode(theme) }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = label, fontSize = 14.sp)
-                    }
-                }
-            }
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
+            Text(
+                text = "全般設定",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
-        // 自動消去設定カード（既存のコードをそのまま配置）
         Card(
-            colors = CardDefaults.cardColors(containerColor = containerBg),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Text(text = "クリップボード自動消去時間", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                // --- テーマ選択 ---
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "アプリのテーマ設定",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "各画面の機能色を生かすライトテーマと、目に優しいコントラストのダークテーマを選べます。",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "消去するまでの秒数", fontSize = 14.sp)
+                    // ボタン内の絵文字をアイコンに変更
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(
+                            Triple(AppTheme.SYSTEM, "システム", Icons.Default.Android),
+                            Triple(AppTheme.LIGHT, "ライト", Icons.Default.WbSunny),
+                            Triple(AppTheme.DARK, "ダーク", Icons.Default.DarkMode)
+                        ).forEach { (theme, label, icon) ->
+                            val isSelected = themeMode == theme
+                            Button(
+                                onClick = { vm.setThemeMode(theme) },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isSelected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.25f),
+                                    contentColor   = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.onSecondaryContainer
+                                ),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp),
+                                contentPadding = PaddingValues(horizontal = 4.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = label,
+                                        fontSize = 13.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                // --- クリップボード自動消去 ---
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        FilledTonalIconButton(
-                            onClick = { if (autoDeleteSec > 5) vm.setAutoDeleteSeconds(autoDeleteSec - 5) },
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Text("-", fontSize = 20.sp)
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
                         Text(
-                            text = "${autoDeleteSec}秒",
+                            text = "クリップボード自動削除時間",
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.widthIn(min = 40.dp),
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        FilledTonalIconButton(
-                            onClick = { if (autoDeleteSec < 120) vm.setAutoDeleteSeconds(autoDeleteSec + 5) },
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Text("+", fontSize = 20.sp)
+                    }
+                    Text(
+                        text = "安全のため、復元したパスワードをコピーしてからスマホのクリップボード内に残しておく時間です。",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(15 to "15秒", 30 to "30秒", 60 to "1分", 120 to "2分").forEach { (sec, label) ->
+                            FilterChip(
+                                selected = autoDeleteSec == sec,
+                                onClick  = { vm.setAutoDeleteSeconds(sec) },
+                                label    = { Text(label, fontSize = 13.sp) },
+                                modifier = Modifier.weight(1f),
+                                shape    = RoundedCornerShape(8.dp),
+                                colors   = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor     = MaterialTheme.colorScheme.primary
+                                )
+                            )
                         }
                     }
                 }
             }
         }
 
-        Text(
-            text = "セキュリティ設定",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        // 生体認証設定カード
-        Card(
-            colors = CardDefaults.cardColors(containerColor = containerBg),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+        // ─── セキュリティ設定セクション ───────────────────────────
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Icon(
+                imageVector = Icons.Default.Shield,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
+            Text(
+                text = "セキュリティ設定",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            // --- 生体認証設定 ---
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .clickable(enabled = biometricState.isHardwareAvailable) {
+                        biometricLockViewModel.updateBiometricSetting(!biometricState.isBiometricEnabled)
+                    }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("アプリ起動時にロックを要求", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Text(
-                        "指紋・顔認証・端末PINで保護します",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        imageVector = if (biometricState.isBiometricEnabled && biometricState.isHardwareAvailable)
+                            Icons.Default.Lock else Icons.Default.LockOpen,
+                        contentDescription = null,
+                        tint = if (biometricState.isBiometricEnabled && biometricState.isHardwareAvailable)
+                            MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(24.dp)
                     )
-                    if (!biometricState.isHardwareAvailable) {
+                    Column {
                         Text(
-                            text = "端末に指紋・顔認証、または画面ロック（PIN等）が設定されていないため利用できません",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.error,
-                            lineHeight = 14.sp,
-                            modifier = Modifier.padding(top = 4.dp)
+                            text = "アプリ起動時にロックを要求",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
+                        Text(
+                            text = "アプリを開く際に、生体認証（指紋・顔）または端末の暗証番号でのロック解除を強制します。",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 16.sp
+                        )
+                        if (!biometricState.isHardwareAvailable) {
+                            Text(
+                                text = "端末に指紋・顔認証、または画面ロック（PIN等）が設定されていないため利用できません",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.error,
+                                lineHeight = 14.sp,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                 }
                 Switch(
-                    enabled = biometricState.isHardwareAvailable,
-                    checked = biometricState.isBiometricEnabled && biometricState.isHardwareAvailable,
-                    onCheckedChange = { biometricLockViewModel.updateBiometricSetting(it) }
+                    enabled   = biometricState.isHardwareAvailable,
+                    checked   = biometricState.isBiometricEnabled && biometricState.isHardwareAvailable,
+                    onCheckedChange = { biometricLockViewModel.updateBiometricSetting(it) },
+                    colors    = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 )
             }
         }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        TextButton(
-            onClick = {
-                context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
-            },
-            modifier = Modifier.fillMaxWidth()
+        // ─── アプリ情報セクション ──────────────────────────────
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
             Text(
-                text = "オープンソースライセンス",
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface
+                text = "アプリ情報",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
-        Text(
-            text = "Version 1.0.0",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 12.dp)
-        )
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // オープンソースライセンス
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                        }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "オープンソースライセンス",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "本アプリで使用されている外部ライブラリなどの情報です。",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = "表示",
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                Text(
+                    text = "Version 1.0.0",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
     }
 }
