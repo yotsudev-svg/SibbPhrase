@@ -1,6 +1,7 @@
 package dev.zenn.yotsu.sibbphrase.ui.screens.settings
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -18,24 +20,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dev.zenn.yotsu.sibbphrase.biometric.presentation.BiometricLockViewModel
+import dev.zenn.yotsu.sibbphrase.model.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     vm: SettingsViewModel = hiltViewModel(),
-    // ✅ BiometricLockViewModel を Hilt から注入
     biometricLockViewModel: BiometricLockViewModel = hiltViewModel()
 ) {
     val autoDeleteSec by vm.autoDeleteSec.collectAsState()
-    val themeMode by vm.themeMode.collectAsState()
-
-    // ✅ 新しい生体認証の状態を取得
+    val themeMode by vm.themeMode.collectAsState() // ViewModelから現在のテーマを取得
     val biometricState by biometricLockViewModel.uiState.collectAsStateWithLifecycle()
 
     val containerBg = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
     val context = LocalContext.current
-
-    // ❌ 以前の LaunchedEffect(Unit) { vm.checkBiometricAvailability... } は不要なので削除
 
     Column(
         modifier = Modifier
@@ -51,10 +49,87 @@ fun SettingsScreen(
             color = MaterialTheme.colorScheme.primary
         )
 
-        /* =========================================
-           テーマ設定と自動消去タイマーのCardは変更なしのため省略
-           （以前のコードのまま残してください）
-           ========================================= */
+        // ✅ 追加：テーマ設定カード
+        Card(
+            colors = CardDefaults.cardColors(containerColor = containerBg),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("アプリのテーマ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // AppThemeの列挙型（SYSTEM, LIGHT, DARK）に合わせて選択肢をループ生成
+                AppTheme.entries.forEach { theme ->
+                    val label = when (theme) {
+                        AppTheme.SYSTEM -> "システムの設定に従う"
+                        AppTheme.LIGHT -> "ライトテーマ"
+                        AppTheme.DARK -> "ダークテーマ"
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { vm.setThemeMode(theme) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (themeMode == theme),
+                            onClick = { vm.setThemeMode(theme) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = label, fontSize = 14.sp)
+                    }
+                }
+            }
+        }
+
+        // 自動消去設定カード（既存のコードをそのまま配置）
+        Card(
+            colors = CardDefaults.cardColors(containerColor = containerBg),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(text = "クリップボード自動消去時間", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "消去するまでの秒数", fontSize = 14.sp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilledTonalIconButton(
+                            onClick = { if (autoDeleteSec > 5) vm.setAutoDeleteSeconds(autoDeleteSec - 5) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Text("-", fontSize = 20.sp)
+                        }
+                        Text(
+                            text = "${autoDeleteSec}秒",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.widthIn(min = 40.dp),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        FilledTonalIconButton(
+                            onClick = { if (autoDeleteSec < 120) vm.setAutoDeleteSeconds(autoDeleteSec + 5) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Text("+", fontSize = 20.sp)
+                        }
+                    }
+                }
+            }
+        }
 
         Text(
             text = "セキュリティ設定",
@@ -64,7 +139,7 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = 8.dp)
         )
 
-        // 生体認証設定
+        // 生体認証設定カード
         Card(
             colors = CardDefaults.cardColors(containerColor = containerBg),
             shape = RoundedCornerShape(16.dp),
@@ -75,7 +150,7 @@ fun SettingsScreen(
                     .padding(16.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("アプリ起動時にロックを要求", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -84,7 +159,6 @@ fun SettingsScreen(
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    // ✅ ViewModelの isHardwareAvailable で判定
                     if (!biometricState.isHardwareAvailable) {
                         Text(
                             text = "端末に指紋・顔認証、または画面ロック（PIN等）が設定されていないため利用できません",
@@ -96,17 +170,13 @@ fun SettingsScreen(
                     }
                 }
                 Switch(
-                    // ✅ ハードウェアが利用可能な時だけ操作可能
                     enabled = biometricState.isHardwareAvailable,
-                    // ✅ 設定がON、かつハードウェアが利用可能な時だけチェック状態にする
                     checked = biometricState.isBiometricEnabled && biometricState.isHardwareAvailable,
-                    // ✅ 新しいViewModelの保存処理を呼び出す
                     onCheckedChange = { biometricLockViewModel.updateBiometricSetting(it) }
                 )
             }
         }
 
-        // ライセンス情報（変更なし）
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         TextButton(
