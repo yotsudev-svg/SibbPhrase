@@ -56,12 +56,12 @@ class DecryptViewModel @Inject constructor(
         viewModelScope.launch {
             crypto.decrypt(input, passphrase)
                 .onSuccess { plain ->
-                    val autoDeleteSec = dataStore.autoDeleteSec.first()
+                    val restoreDisplaySec = dataStore.restoreDisplaySec.first()
                     _uiState.update {
                         it.copy(outputText = plain, isLoading = false,
-                            timerSeconds = autoDeleteSec)
+                            timerSeconds = restoreDisplaySec)
                     }
-                    startAutoDeleteTimer(autoDeleteSec)
+                    startAutoDeleteTimer(restoreDisplaySec)
                 }
                 .onFailure { e ->
                     val msg = if (e is javax.crypto.AEADBadTagException)

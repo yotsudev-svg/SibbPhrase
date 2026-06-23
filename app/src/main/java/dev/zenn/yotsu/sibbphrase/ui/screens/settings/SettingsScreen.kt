@@ -42,10 +42,11 @@ fun SettingsScreen(
     vm: SettingsViewModel = hiltViewModel(),
     biometricLockViewModel: BiometricLockViewModel = hiltViewModel()
 ) {
-    val autoDeleteSec  by vm.autoDeleteSec.collectAsState()
-    val themeMode      by vm.themeMode.collectAsState()
-    val biometricState by biometricLockViewModel.uiState.collectAsStateWithLifecycle()
-    val context        = LocalContext.current
+    val autoDeleteSec      by vm.autoDeleteSec.collectAsState()
+    val restoreDisplaySec by vm.restoreDisplaySec.collectAsState()
+    val themeMode          by vm.themeMode.collectAsState()
+    val biometricState     by biometricLockViewModel.uiState.collectAsStateWithLifecycle()
+    val context            = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -175,10 +176,58 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        listOf(15 to "15秒", 30 to "30秒", 60 to "1分", 120 to "2分").forEach { (sec, label) ->
+                        listOf(30 to "30秒", 60 to "1分", 90 to "1分30秒", 120 to "2分").forEach { (sec, label) ->
                             FilterChip(
                                 selected = autoDeleteSec == sec,
                                 onClick  = { vm.setAutoDeleteSeconds(sec) },
+                                label    = { Text(label, fontSize = 13.sp) },
+                                modifier = Modifier.weight(1f),
+                                shape    = RoundedCornerShape(8.dp),
+                                colors   = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor     = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
+                }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                // --- 復元パスワードの表示時間 ---
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_restore_display_label),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.settings_restore_display_desc),
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(30 to "30秒", 60 to "1分", 90 to "1分30秒", 120 to "2分").forEach { (sec, label) ->
+                            FilterChip(
+                                selected = restoreDisplaySec == sec,
+                                onClick  = { vm.setRestoreDisplaySeconds(sec) },
                                 label    = { Text(label, fontSize = 13.sp) },
                                 modifier = Modifier.weight(1f),
                                 shape    = RoundedCornerShape(8.dp),

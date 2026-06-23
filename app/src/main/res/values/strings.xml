@@ -85,6 +85,8 @@
     <string name="settings_theme_dark">ダーク</string>
     <string name="settings_clipboard_label">クリップボード自動削除時間</string>
     <string name="settings_clipboard_desc">安全のため、復元したパスワードをコピーしてからスマホのクリップボード内に残しておく時間です。</string>
+    <string name="settings_restore_display_label">復元パスワードの表示時間</string>
+    <string name="settings_restore_display_desc">復元されたパスワードを画面上に表示し続ける時間です。安全のため、一定時間で自動的に隠されます。</string>
     <string name="settings_security_title">セキュリティ設定</string>
     <string name="settings_biometric_label">アプリ起動時にロックを要求</string>
     <string name="settings_biometric_desc">アプリを開く際に、生体認証（指紋・顔）または端末の暗証番号でのロック解除を強制します。</string>

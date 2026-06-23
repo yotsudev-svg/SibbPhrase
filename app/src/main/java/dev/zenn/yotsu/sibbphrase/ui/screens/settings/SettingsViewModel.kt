@@ -17,7 +17,10 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val autoDeleteSec: StateFlow<Int> = dataStoreManager.autoDeleteSec
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
+
+    val restoreDisplaySec: StateFlow<Int> = dataStoreManager.restoreDisplaySec
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
     val themeMode: StateFlow<AppTheme> = dataStoreManager.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppTheme.SYSTEM)
@@ -25,6 +28,12 @@ class SettingsViewModel @Inject constructor(
     fun setAutoDeleteSeconds(sec: Int) {
         viewModelScope.launch {
             dataStoreManager.setAutoDeleteSeconds(sec)
+        }
+    }
+
+    fun setRestoreDisplaySeconds(sec: Int) {
+        viewModelScope.launch {
+            dataStoreManager.setRestoreDisplaySeconds(sec)
         }
     }
 

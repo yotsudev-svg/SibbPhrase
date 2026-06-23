@@ -24,6 +24,7 @@ class DataStoreManager @Inject constructor(
     companion object {
         private val KEY_ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         private val KEY_AUTO_DELETE_SEC = intPreferencesKey("auto_delete_sec")
+        private val KEY_RESTORE_DISPLAY_SEC = intPreferencesKey("restore_display_sec")
         private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
@@ -31,7 +32,10 @@ class DataStoreManager @Inject constructor(
         .map { prefs -> prefs[KEY_ONBOARDING_DONE] ?: false }
 
     val autoDeleteSec: Flow<Int> = context.dataStore.data
-        .map { prefs -> prefs[KEY_AUTO_DELETE_SEC] ?: 30 }
+        .map { prefs -> prefs[KEY_AUTO_DELETE_SEC] ?: 60 }
+
+    val restoreDisplaySec: Flow<Int> = context.dataStore.data
+        .map { prefs -> prefs[KEY_RESTORE_DISPLAY_SEC] ?: 60 }
 
     val themeMode: Flow<AppTheme> = context.dataStore.data
         .map { prefs ->
@@ -49,6 +53,10 @@ class DataStoreManager @Inject constructor(
 
     suspend fun setAutoDeleteSeconds(sec: Int) {
         context.dataStore.edit { it[KEY_AUTO_DELETE_SEC] = sec }
+    }
+
+    suspend fun setRestoreDisplaySeconds(sec: Int) {
+        context.dataStore.edit { it[KEY_RESTORE_DISPLAY_SEC] = sec }
     }
 
     suspend fun setThemeMode(theme: AppTheme) {
