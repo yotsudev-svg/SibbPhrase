@@ -27,6 +27,20 @@ import androidx.navigation.NavController
 import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.data.qr.QrManager
 
+/**
+ * QRコード表示画面（QrShowScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/qr/）
+ * 責務: 保存されている合言葉を元にQRコードを生成・表示し、家族間での合言葉共有を支援する。
+ *
+ * デザイン上の特徴:
+ * 共有の緊急性と安全性のバランスを考慮し、300秒（5分）の有効期限カウントダウンを
+ * 視覚的なプログレスバーとともに提示。期限切れ時には直感的な再生成ボタンを提供することで、
+ * IT操作に不慣れな家族でも迷わず安全に共有を完了できるよう設計されている。
+ *
+ * @param navController 画面遷移を制御するコントローラー。
+ * @param vm QR生成・表示のロジックを管理する ViewModel。デフォルトで Hilt により注入される。
+ */
 @Composable
 fun QrShowScreen(
     navController: NavController,

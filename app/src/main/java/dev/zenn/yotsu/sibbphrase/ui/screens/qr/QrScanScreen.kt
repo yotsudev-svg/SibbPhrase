@@ -60,6 +60,27 @@ private fun Context.findActivity(): Activity? {
     return null
 }
 
+/**
+ * QRコードスキャン画面（QrScanScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/qr/）
+ * 責務: CameraX と ML Kit を用いて家族のQRコードをスキャンし、抽出された合言葉を安全に保存する。
+ *
+ * 設計・UX上の工夫:
+ * 設計・UX上の工夫:
+ * 1. **権限管理の統合**: カメラ権限の要求から、永久拒否時の設定画面誘導までを一貫してハンドリング。
+ *    永久拒否（「今後表示しない」）の判定は `permissionRequested` フラグとの AND 条件で行う。
+ *    `shouldShowRequestPermissionRationale` は初回未リクエスト時も `false` を返すため、
+ *    単独では初回と永久拒否を区別できず、一度でもリクエストを行ったことを示す
+ *    `permissionRequested` との組み合わせが不可欠である。
+ * 2. **ハードウェアフォールバック**: カメラ非搭載や故障端末でも利用できるよう、自動的に手動入力モードへ切り替わる設計を採用。
+ * 3. **堅牢な解析の反映**: `QrManager` の解析ロジック（lastIndexOf）に基づき、複雑な合言葉でも安全に抽出・反映。
+ * 4. **フィードバック**: スキャン成功時には、IT操作に不慣れな家族が達成感を得られるよう、大きな成功カードを一定時間表示してから遷移する。
+ *
+ * @param navController 画面遷移を制御するコントローラー。
+ * @param onSuccess 解析・保存が正常に完了し、成功画面を表示した後に呼ばれるコールバック。
+ * @param vm QRスキャン・解析のロジックを管理する ViewModel。デフォルトで Hilt により注入される。
+ */
 @OptIn(ExperimentalGetImage::class, ExperimentalMaterial3Api::class)
 @Composable
 fun QrScanScreen(

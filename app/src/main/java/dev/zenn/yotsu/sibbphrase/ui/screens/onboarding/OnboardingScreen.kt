@@ -21,12 +21,26 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import dev.zenn.yotsu.sibbphrase.R
 
+/**
+ * オンボーディング画面の各ページ情報を保持するデータクラス。
+ *
+ * @property icon ページ中央に表示するアイコン（Outlinedタイプ）。
+ * @property titleRes タイトル文字列のリソースID。
+ * @property descriptionRes 説明文文字列のリソースID。
+ */
 private data class OnboardingPage(
     val icon:        ImageVector,
     val titleRes:    Int,
     val descriptionRes: Int
 )
 
+/**
+ * オンボーディング（チュートリアル）の全ページ構成。
+ *
+ * 設計意図:
+ * IT操作に不慣れな家族が、アプリの「安心・安全・家族間共有」というコンセプトを
+ * 直感的に理解できるよう、4つのステップで構成されている。
+ */
 private val pages = listOf(
     OnboardingPage(
         icon        = Icons.Outlined.Lock,
@@ -50,6 +64,16 @@ private val pages = listOf(
     )
 )
 
+/**
+ * オンボーディング画面（OnboardingScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/onboarding/）
+ * 責務: 初回起動時に表示される4ページのスライド型チュートリアルを提供し、
+ * アプリの目的や使い方を分かりやすく伝える。
+ *
+ * @param onFinish チュートリアル終了時、または「スキップ」押下時に呼ばれるコールバック。
+ *                 通常は `OnboardingViewModel.markOnboardingDone()` を経由してメイン画面へ遷移する。
+ */
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit) {
     var currentPage by remember { mutableIntStateOf(0) }
@@ -147,6 +171,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
     }
 }
 
+/**
+ * オンボーディングの1ページ分のコンテンツを表示するComposable。
+ *
+ * @param page 表示対象の [OnboardingPage] オブジェクト。
+ */
 @Composable
 private fun PageContent(page: OnboardingPage) {
     Column(
@@ -185,3 +214,4 @@ private fun PageContent(page: OnboardingPage) {
         )
     }
 }
+

@@ -31,6 +31,25 @@ import dev.zenn.yotsu.sibbphrase.ui.screens.qr.QrShowScreen
 import dev.zenn.yotsu.sibbphrase.ui.screens.settings.SettingsScreen
 import dev.zenn.yotsu.sibbphrase.ui.screens.passphrase.PassphraseScreen
 
+/**
+ * SibbPhrase アプリのルートComposableおよびナビゲーショングラフ定義。
+ *
+ * アーキテクチャ上の配置: ナビゲーション層（ui/navigation/）
+ * 責務:
+ * 1. [NavHost] によるアプリ全体の画面遷移グラフを定義する。
+ * 2. [Scaffold] に [SibbPhraseTopBar]（カスタムTopBar）とBottomNavigationBarを組み込み、
+ *    現在のルートに応じて表示内容を切り替える。
+ * 3. [MainViewModel] の [SharedNavigationEvent] を購読し、他アプリからのテキスト共有に応じた
+ *    ナビゲーションイベントを処理する。
+ * 4. [OnboardingViewModel] のオンボーディング完了フラグに基づき、スタート画面を動的に決定する。
+ *
+ * BottomNavigationBarに表示される画面: [Screen.Encrypt] / [Screen.Decrypt] / [Screen.Passphrase]
+ * TopBarが表示される画面: 上記3画面 + [Screen.Settings]
+ * TopBarが表示されない画面: [Screen.Onboarding] / [Screen.QrShow] / [Screen.QrScan]
+ *
+ * @param mainVm 他アプリからのテキスト共有イベントとテーマ管理を担うViewModel。
+ * @param onboardingVm オンボーディング完了フラグの管理を担うViewModel。
+ */
 @Composable
 fun SibbPhraseApp(
     mainVm: MainViewModel = hiltViewModel(),

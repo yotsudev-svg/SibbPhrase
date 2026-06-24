@@ -22,6 +22,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.zenn.yotsu.sibbphrase.R
 
+/**
+ * アプリがロック状態のときに表示されるスプラッシュ型ロック画面のComposable。
+ *
+ * アーキテクチャ上の配置: 生体認証モジュール（biometric/presentation/）
+ * 責務: [BiometricLockState] の状態に応じて3つの表示モードを切り替え、
+ * ユーザーに適切なアクションを促す。
+ *
+ * 表示モード:
+ * 1. **ロックアウト中** ([BiometricLockState.isLockout] = `true`):
+ *    再試行ボタンは表示せず、PINによるロック解除を案内するテキストのみを表示する。
+ * 2. **生体情報未登録** ([BiometricLockState.isEnrollmentRequired] = `true`):
+ *    端末の生体情報登録画面への誘導ボタンを表示する。
+ *    API 30 以上は [Settings.ACTION_BIOMETRIC_ENROLL] で直接登録画面へ遷移し、
+ *    API 29 以下または [ActivityNotFoundException] 発生時は
+ *    [Settings.ACTION_SECURITY_SETTINGS] へフォールバックする。
+ * 3. **通常状態** (上記以外):
+ *    再試行ボタンを表示し、[onRetryClick] を通じて認証ダイアログの再表示を促す。
+ *
+ * 設定画面から戻ったタイミングでの状態更新は、[BiometricLockWrapper] 内の
+ * DataStore 監視 Flow が自動的に検知するため、本Composable側での明示的な再評価処理は不要。
+ *
+ * @param uiState 現在の生体認証ロック状態。表示内容の切り替えに使用する。
+ * @param onRetryClick 通常状態の再試行ボタンが押下されたときのコールバック。
+ *                     通常は [BiometricLockViewModel.triggerAuthentication] に接続される。
+ */
 @Composable
 fun AppSplashLockScreen(
     uiState: BiometricLockState,

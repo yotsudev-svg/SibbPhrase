@@ -29,6 +29,20 @@ import androidx.navigation.NavController
 import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.ui.navigation.Screen
 
+/**
+ * 合言葉管理画面（PassphraseScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/passphrase/）
+ * 責務: 合言葉の登録・変更・リセット、および家族間共有のためのQR表示・スキャン画面への遷移を管理する。
+ *
+ * デザイン上の特徴:
+ * 家族で統一された秘密鍵（合言葉）を扱うためのハブとなる画面であり、
+ * セキュリティ上の重要性を伝える説明バナー、視認性の高い入力フィールド、
+ * 誤操作を防ぐための確認ダイアログを採用している。
+ *
+ * @param nav 画面遷移を制御する NavController。QR表示/スキャン画面への遷移に使用される。
+ * @param vm 合言葉管理のロジックを管理する ViewModel。デフォルトで Hilt により注入される。
+ */
 @Composable
 fun PassphraseScreen(
     nav: NavController?  = null,
@@ -249,8 +263,6 @@ fun PassphraseScreen(
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         // QR連携セクション（ロジックはファイルAのnav.navigateを維持）
-        val errorShortMsg = stringResource(R.string.passphrase_error_too_short)
-
     Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -298,3 +310,4 @@ fun PassphraseScreen(
         }
     }
 }
+

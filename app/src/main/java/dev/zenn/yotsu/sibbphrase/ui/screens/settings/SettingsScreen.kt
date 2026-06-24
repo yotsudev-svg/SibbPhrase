@@ -36,6 +36,28 @@ import dev.zenn.yotsu.sibbphrase.R
 import dev.zenn.yotsu.sibbphrase.biometric.presentation.BiometricLockViewModel
 import dev.zenn.yotsu.sibbphrase.model.AppTheme
 
+/**
+ * アプリの各種設定を管理する設定画面のComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/settings/）
+ * 責務: テーマ・クリップボード自動消去秒数・復元表示秒数・生体認証ON/OFFの4つの設定項目を
+ * ユーザーに提示し、変更操作を各ViewModelへ中継する。
+ *
+ * 表示セクション:
+ * 1. **全般設定**: テーマ選択（システム/ライト/ダーク）・クリップボード自動消去秒数・
+ *    復元表示秒数を [SettingsViewModel] 経由で管理する。
+ * 2. **セキュリティ設定**: 生体認証の有効/無効スイッチを [BiometricLockViewModel] 経由で管理する。
+ *    ハードウェアが利用不可の場合はスイッチを無効化し、利用不可の旨をテキストで案内する。
+ * 3. **アプリ情報**: OSSライセンス画面へのリンクとアプリバージョン表示。
+ *
+ * 設計上の注意:
+ * 生体認証設定の変更は [BiometricLockViewModel.updateBiometricSetting] を直接呼び出すため、
+ * [SettingsViewModel] は生体認証状態を持たない。2つのViewModelを使い分けることで
+ * 各ViewModelの責務を明確に分離している。
+ *
+ * @param vm テーマ・タイマー設定の管理を担うViewModel。デフォルトで Hilt により注入される。
+ * @param biometricLockViewModel 生体認証設定の管理を担うViewModel。デフォルトで Hilt により注入される。
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -268,6 +290,8 @@ fun SettingsScreen(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             // --- 生体認証設定 ---
+            // ✅ Switch 単体のタッチターゲットは小さく、IT操作に不慣れな高齢者が押し損ねるケースを
+            //    考慮して Row 全体をタップ可能にしている。このアプリのターゲット層（子供〜高齢者）への配慮。
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

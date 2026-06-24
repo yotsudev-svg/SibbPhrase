@@ -38,6 +38,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.zenn.yotsu.sibbphrase.R
 
+/**
+ * 暗号化画面（EncryptScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/encrypt/）
+ * 責務: 平文の入力インターフェースを提供し、AES-256-GCMによる暗号化結果の共有・コピーをユーザーに促す。
+ *
+ * デザイン上の特徴:
+ * 子供から高齢者まで幅広い家族層が利用することを想定し、視認性の高い大きなフォント（20sp）、
+ * 押しやすいボタンサイズ（高さ64dp）、および操作意図を明確にする説明カードを採用している。
+ *
+ * @param vm 暗号化画面のロジックを管理する ViewModel。デフォルトで Hilt により注入される。
+ */
 @Composable
 fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
     // --- ロジック部分（ファイルAから維持） ---
@@ -319,12 +331,24 @@ fun EncryptScreen(vm: EncryptViewModel = hiltViewModel()) {
     }
 }
 
-// --- ロジック部分（ファイルAから維持） ---
+/**
+ * テキストをクリップボードにコピーするヘルパー関数。
+ *
+ * @param ctx コンテキスト
+ * @param text コピー対象の文字列
+ */
 private fun copyToClipboard(ctx: Context, text: String) {
     val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     cm.setPrimaryClip(ClipData.newPlainText("SibbPhrase", text))
 }
 
+/**
+ * 外部アプリとテキストを共有するための IntentChooser を起動するヘルパー関数。
+ *
+ * @param ctx コンテキスト
+ * @param text 共有する暗号文
+ * @param title 共有セレクターに表示するタイトル
+ */
 private fun shareText(ctx: Context, text: String, title: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

@@ -33,6 +33,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
+/**
+ * 復元画面（DecryptScreen）のメインComposable。
+ *
+ * アーキテクチャ上の配置: プレゼンテーション層（ui/screens/decrypt/）
+ * 責務: 暗号文の入力インターフェースを提供し、復号結果と自動消去タイマーをユーザーに提示する。
+ *
+ * デザイン上の特徴:
+ * IT操作に不慣れな家族が迷わないよう、大きな入力フィールド、押しやすい復元ボタン、
+ * そして「60秒」のゆとりを持った自動消去タイマー表示（Timelapseアイコン付き）を採用している。
+ *
+ * @param vm 復元画面のロジックを管理する ViewModel。デフォルトで Hilt により注入される。
+ */
 @Composable
 fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
     // --- ロジック部分（ファイルAから維持） ---
@@ -331,7 +343,12 @@ fun DecryptScreen(vm: DecryptViewModel = hiltViewModel()) {
     }
 }
 
-// --- ロジック部分（ファイルAから維持） ---
+/**
+ * テキストをクリップボードにコピーするヘルパー関数。
+ *
+ * @param ctx コンテキスト
+ * @param text コピー対象の文字列
+ */
 private fun copyToClipboard(ctx: Context, text: String) {
     val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     cm.setPrimaryClip(ClipData.newPlainText("SibbPhrase", text))
